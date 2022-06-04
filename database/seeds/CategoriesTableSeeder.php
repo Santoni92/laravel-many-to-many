@@ -2,7 +2,7 @@
 
 use Illuminate\Database\Seeder;
 
-use Illuminate\Support\Str;
+use Illuminate\Support\Str; //importo la classe Slug così da ottenere la versione slugata del name
 use App\Category;   //importo il modello
 class CategoriesTableSeeder extends Seeder
 {

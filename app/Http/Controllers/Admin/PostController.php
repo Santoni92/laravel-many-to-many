@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 
 use Illuminate\Support\Str;
 use App\Post;   //importo il modello
+use App\Category;   //importo il modello
 class PostController extends Controller
 {
     /**
@@ -29,7 +30,8 @@ class PostController extends Controller
     public function create()
     {
         //
-        return view('admin.posts.create');
+        $categories = Category::all();
+        return view('admin.posts.create',compact('categories'));
     }
 
     /**
@@ -41,10 +43,20 @@ class PostController extends Controller
     public function store(Request $request)
     {
         //effettuo il controllo e la validazione dei dati immessi dall'utente e conservati in $request
+        //questi controlli devono rispecchiare le condizioni imposte nella migration per la creazione della relativa tabella
         $request->validate([
             'title'=>'required|max:250',
-            'content'=>'required'
-        ]);
+            'content'=>'required|min:5|max100',
+            'category_id'=>'required|exist:categories,id'//mi assicuro che  il valore presente in 'category_id' o è nullo oppure se è valorizzato esista nella tabella
+        ],
+    [//personalizzo i messaggi di errore
+        'title.required' =>'Il titolo deve essere valorizzato',
+        'title.max'=>'Hai superato i :attribute caratteri',
+        'content.required'=>':attribute deve essere compilato',
+        'content.min'=>'Il contenuto deve avere almeno .min caratteri',
+        'content.max'=>'Il contenuto deve avere al massimo :max caratteri',
+        'category_id.exist'=>'La categoria selezionata non esiste'
+    ]);
         $postData = $request->all();
         $newPost = new Post();
         $newPost->fill($postData);
@@ -54,7 +66,7 @@ class PostController extends Controller
         $counter = 1;
         while($postFound)
         {
-            $alternativeSlug = $slug . '-' . $counter;
+            $alternativeSlug = $slug . '_' . $counter;
             $counter++;
             $postFound = Post::where('slug',$alternativeSlug)->first();
         }
@@ -72,7 +84,7 @@ class PostController extends Controller
     public function show($id)
     {
         //
-        $post = Post::findOrFail($id);  // $post = Post::find($id);
+        $post = Post::find($id);  // $post = Post::findOrFail($id);
         if(!$post)
         {
             abort(404);
@@ -90,12 +102,14 @@ class PostController extends Controller
     public function edit($id)
     {
         //
-        $post = Post::findOrFail($id);  // $post = Post::find($id);
+        $post = Post::find($id);  // $post = Post::findOrFail($id);
         if(!$post)
         {
             abort(404);
         }
-        return view('admin.posts.edit',compact('post'));
+
+        $categories = Category::all();
+        return view('admin.posts.edit',compact('post','categories'));
     }
 
     /**
@@ -111,7 +125,16 @@ class PostController extends Controller
         $post = Post::findOrFail($id);  // $post = Post::find($id);
         $request->validate([
             'title'=>'required|max:250',
-            'content'=>'required'
+            'content'=>'required',
+            'category_id'=>'required|exist:categories,id'
+        ],
+         [//personalizzo i messaggi di errore
+            'title.required' =>'Il titolo deve essere valorizzato',
+            'title.max'=>'Hai superato i :attribute caratteri',
+            'content.required'=>':attribute deve essere compilato',
+            'content.min'=>'Il contenuto deve avere almeno .min caratteri',
+            'content.max'=>'Il contenuto deve avere al massimo :max caratteri',
+            'category_id.exist'=>'La categoria selezionata non esiste'
         ]);
 
         $postData = $request->all();
@@ -123,7 +146,7 @@ class PostController extends Controller
         $counter = 1;
         while($postFound)
         {
-            $alternativeSlug = $slug . '-' . $counter;
+            $alternativeSlug = $slug . '_' . $counter;
             $counter++;
             $postFound = Post::where('slug',$alternativeSlug)->first();
         }
@@ -143,7 +166,13 @@ class PostController extends Controller
     public function destroy($id)
     {
         //
-        $post = Post::findOrFail($id);  // $post = Post::find($id);
+        $post = Post::findOrFail($id);
+        /* $post = Post::find($id);
+           if(!$post)
+          {
+            abort(404);
+          }
+        */
         $post->delete();
 
         return redirect()->route('admin.posts.index');
