@@ -115,7 +115,8 @@ class PostController extends Controller
         }
 
         $categories = Category::all();
-        return view('admin.posts.edit',compact('post','categories'));
+        $tags = Tag::all();
+        return view('admin.posts.edit',compact('post','categories','tags'));
     }
 
     /**
@@ -132,15 +133,17 @@ class PostController extends Controller
         $request->validate([
             'title'=>'required|max:250',
             'content'=>'required',
-            'category_id'=>'required|exist:categories,id'
+            'category_id'=>'required|exists:categories,id',
+            'tags[]'=>'exists:tags,id'
         ],
          [//personalizzo i messaggi di errore
             'title.required' =>'Il titolo deve essere valorizzato',
             'title.max'=>'Hai superato i :attribute caratteri',
             'content.required'=>':attribute deve essere compilato',
-            'content.min'=>'Il contenuto deve avere almeno .min caratteri',
+            'content.min'=>'Il contenuto deve avere almeno :min caratteri',
             'content.max'=>'Il contenuto deve avere al massimo :max caratteri',
-            'category_id.exist'=>'La categoria selezionata non esiste'
+            'category_id.exists'=>'La categoria selezionata non esiste',
+            'tags[]'=>'Tag non esiste'
         ]);
 
         $postData = $request->all();
@@ -157,6 +160,11 @@ class PostController extends Controller
             $postFound = Post::where('slug',$alternativeSlug)->first();
         }
         $post->slug = $alternativeSlug;
+
+        if(array_key_exists('tags',$postData))
+        {
+            $post->tags()->sync($postData['tags']);
+        }
 
         $post->update();
         return redirect()->route('admin.posts.index');

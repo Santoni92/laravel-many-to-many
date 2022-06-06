@@ -36,10 +36,21 @@
                         {{ $category->id == old('category_id', $post->category_id) ? 'selected' : '' }}>
                         {{ $category->name }}
                     </option>
-                    <!--selected per segnalare la option selezionata-->
+                    <!--selected serve per segnalare la option selezionata-->
                 @endforeach
             </select>
             @error('category_id')
+                {{ $message }}
+            @enderror
+        </div>
+
+        <div>
+            @foreach ($tags as $tag)
+                <label for="tags[]">{{ $tag->name }}</label>
+                <input type="checkbox" name="tags[]" value="{{ $tag->id }}"
+                    {{ $post->tags->contains($tag) ? 'checked' : '' }}>
+            @endforeach
+            @error($tags)
                 {{ $message }}
             @enderror
         </div>
