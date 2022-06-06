@@ -35,10 +35,22 @@
                     <option value="{{ $category->id }}" {{ $category->id == old('category_id') ? 'selected' : '' }}>
                         {{ $category->name }}
                     </option>
-                    <!--selected per segnalare la option selezionata-->
+                    <!--selected serve per segnalare la option selezionata-->
                 @endforeach
             </select>
             @error('category_id')
+                {{ $message }}
+            @enderror
+        </div>
+
+        <div>
+            <div>Tags</div>
+            @foreach ($tags as $tag)
+                <label for="tags[]">{{ $tag->name }}</label>
+                <input type="checkbox" name="tags[]" value="{{ $tag->id }}">
+            @endforeach
+
+            @error('tags[]')
                 {{ $message }}
             @enderror
         </div>

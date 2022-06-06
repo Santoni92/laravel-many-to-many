@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use App\Post;   //importo il modello
 use App\Category;   //importo il modello
+use App\Tag;    //importo il modello
 class PostController extends Controller
 {
     /**
@@ -31,7 +32,8 @@ class PostController extends Controller
     {
         //
         $categories = Category::all();
-        return view('admin.posts.create',compact('categories'));
+        $tags = Tag::all();
+        return view('admin.posts.create',compact('categories','tags'));
     }
 
     /**
@@ -46,16 +48,18 @@ class PostController extends Controller
         //questi controlli devono rispecchiare le condizioni imposte nella migration per la creazione della relativa tabella
         $request->validate([
             'title'=>'required|max:250',
-            'content'=>'required|min:5|max100',
-            'category_id'=>'required|exist:categories,id'//mi assicuro che  il valore presente in 'category_id' o è nullo oppure se è valorizzato esista nella tabella
+            'content'=>'required|min:5|max:100',
+            'category_id'=>'required|exists:categories,id',//mi assicuro che  il valore presente in 'category_id' o è nullo oppure se è valorizzato esista nella tabella
+            'tags[]'=>'exists:tags,id'
         ],
     [//personalizzo i messaggi di errore
         'title.required' =>'Il titolo deve essere valorizzato',
         'title.max'=>'Hai superato i :attribute caratteri',
         'content.required'=>':attribute deve essere compilato',
-        'content.min'=>'Il contenuto deve avere almeno .min caratteri',
+        'content.min'=>'Il contenuto deve avere almeno :min caratteri',
         'content.max'=>'Il contenuto deve avere al massimo :max caratteri',
-        'category_id.exist'=>'La categoria selezionata non esiste'
+        'category_id.exists'=>'La categoria selezionata non esiste',
+        'tags[]'=>'Tag non esiste'
     ]);
         $postData = $request->all();
         $newPost = new Post();
@@ -72,6 +76,8 @@ class PostController extends Controller
         }
         $newPost->slug = $alternativeSlug;
         $newPost->save();
+
+        $newPost->tags()->sync($postData['tags']);
         return redirect()->route('admin.posts.index');
     }
 
