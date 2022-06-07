@@ -22,7 +22,7 @@
 
     <a href="{{ route('admin.posts.edit', $post->id) }}">Modifica post</a>
 
-    <!--form per l'eleiminazione di un post-->
+    <!--form per l'eliminazione di un post-->
     <form action="{{ route('admin.posts.destroy', $post->id) }}" method="post">
         @csrf
         @method('delete')

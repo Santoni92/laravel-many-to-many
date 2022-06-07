@@ -11,11 +11,11 @@ class Post extends Model
 
     public function category()
     {
-        return $this->belongsTo('App\Category');
+        return $this->belongsTo('App\Category');    //ci ritorna un oggetto
     }
 
-    public function tags()
+    public function tags()  //un post può avere più tag ed ecco perchè uso il plurale
     {
-        return $this->belongsToMany('App\Tag');
+        return $this->belongsToMany('App\Tag'); //ci ritorna un array
     }
 }

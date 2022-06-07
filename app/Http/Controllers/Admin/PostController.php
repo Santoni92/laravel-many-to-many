@@ -188,6 +188,7 @@ class PostController extends Controller
           }
         */
         $post->delete();
+        $post->tags()->sync([]);
 
         return redirect()->route('admin.posts.index');
     }
