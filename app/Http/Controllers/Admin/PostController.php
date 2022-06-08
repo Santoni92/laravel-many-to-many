@@ -75,9 +75,10 @@ class PostController extends Controller
             $postFound = Post::where('slug',$alternativeSlug)->first();
         }
         $newPost->slug = $alternativeSlug;
-        $newPost->save();
+        $newPost->save();   //prima salvo il post e poi ci metto l'id nella  relativa colonna della tabella ponte(pivot)
 
-        $newPost->tags()->sync($postData['tags']);
+        //dd($postData['tags'])
+        $newPost->tags()->sync($postData['tags']);  //aggiorno la tabella pivot con gli id che passo col form
         return redirect()->route('admin.posts.index');
     }
 
