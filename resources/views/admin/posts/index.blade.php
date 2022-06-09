@@ -9,6 +9,8 @@
             <tr>
                 <td>Titolo</td>
                 <td>Slug</td>
+                <td>Categoria</td>
+                <td>Tags</td>
             </tr>
         </thead>
         <tbody>
@@ -16,6 +18,12 @@
                 <tr>
                     <td>{{ $post->title }}</td>
                     <td>{{ $post->slug }}</td>
+                    <td>{{ $post->category->name }}</td>
+                    <td>
+                        @foreach ($post->tags as $tag)
+                            <span>{{ $tag->name }}</span>
+                        @endforeach
+                    </td>
                     <td><a href="{{ route('admin.posts.show', $post->id) }}">Visualizza dettaglio del post</a></td>
 
                 </tr>

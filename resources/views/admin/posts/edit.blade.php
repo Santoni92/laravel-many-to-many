@@ -45,14 +45,33 @@
         </div>
 
         <div>
+            <div>Tags</div>
             @foreach ($tags as $tag)
-                <label for="tags[]">{{ $tag->name }}</label>
-                <input type="checkbox" name="tags[]" value="{{ $tag->id }}"
-                    {{ $post->tags->contains($tag) ? 'checked' : '' }}>
+                @if ($errors->any())
+                    <!--qualunque sia l'errore da parte dell'utente nell'invio dei dati tramite form si entra nell'if-->
+                    <!--per visualizzre gli ultimi tag selezionati nel caso ci dovesse essere errore nella compilazione del form-->
+                    <label for="tags[]">{{ $tag->name }}</label>
+                    <input type="checkbox" name="tags[]" value="{{ $tag->id }}"
+                        {{ in_array($tag->id, old('tags', [])) ? 'checked' : '' }}>
+                @else
+                    <label for="tags[]">{{ $tag->name }}</label>
+                    <input type="checkbox" name="tags[]" value="{{ $tag->id }}"
+                        {{ $post->tags->contains($tag) ? 'checked' : '' }}>
+                @endif
             @endforeach
             @error($tags)
                 {{ $message }}
             @enderror
+        </div>
+
+        <div>
+            @if ($post->cover)
+                <div>
+                    <img src="{{ asset('storage/' . $post->cover) }}" alt="">
+                </div>
+            @endif
+            <label for="image">Immagine cover</label>
+            <input type="file" name="image">
         </div>
 
         <button type="submit">Modifica il post</button>

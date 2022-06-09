@@ -13,7 +13,7 @@ class CreatePostTagTable extends Migration
      */
     public function up()
     {
-        Schema::create('post_tag', function (Blueprint $table) {
+        Schema::create('post_tag', function (Blueprint $table) {    //per convenzione il nome della tabella pivot si dà unendo con un ' _ ' i nomi delle due tabelle che vengono referenziate messe in ordine alfabetico (in questo caso la p viene prima della t !!!)
            // $table->id();
             //$table->timestamps();
 

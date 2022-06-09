@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
 use App\Post;   //importo il modello
 use App\Category;   //importo il modello
 use App\Tag;    //importo il modello
@@ -50,7 +51,8 @@ class PostController extends Controller
             'title'=>'required|max:250',
             'content'=>'required|min:5|max:100',
             'category_id'=>'required|exists:categories,id',//mi assicuro che  il valore presente in 'category_id' o è nullo oppure se è valorizzato esista nella tabella
-            'tags[]'=>'exists:tags,id'
+            'tags[]'=>'exists:tags,id',
+            'image'=>'nullable|image'//il file inserito può non esserci (cioè l'utente può anche non inserirlo) ma se viene inserito allora deve essere per forza una immagine
         ],
     [//personalizzo i messaggi di errore
         'title.required' =>'Il titolo deve essere valorizzato',
@@ -59,10 +61,17 @@ class PostController extends Controller
         'content.min'=>'Il contenuto deve avere almeno :min caratteri',
         'content.max'=>'Il contenuto deve avere al massimo :max caratteri',
         'category_id.exists'=>'La categoria selezionata non esiste',
-        'tags[]'=>'Tag non esiste'
+        'tags[]'=>'Tag non esiste',
+        'image'>='Il file dev\'essere un\'immagine'
     ]);
         $postData = $request->all();
+        if(array_key_exists('image',$postData))
+        {
+            $img_path = Storage::put('uploads',$postData['image']);
+            $postData['cover'] = $img_path;
+        }
         $newPost = new Post();
+        //$newPost->cover = $img_path; se non utilizzo la fillable
         $newPost->fill($postData);
         $slug = Str::slug($newPost->title);
         $alternativeSlug = $slug;
@@ -97,6 +106,8 @@ class PostController extends Controller
             abort(404);
         }
 
+        //$category = Category::find($post->category_id);
+        //return view('admin.posts.show',compact('post','category'));
         return view('admin.posts.show',compact('post'));
     }
 
@@ -135,7 +146,8 @@ class PostController extends Controller
             'title'=>'required|max:250',
             'content'=>'required',
             'category_id'=>'required|exists:categories,id',
-            'tags[]'=>'exists:tags,id'
+            'tags[]'=>'exists:tags,id',
+            'image'=>'nullable|image'
         ],
          [//personalizzo i messaggi di errore
             'title.required' =>'Il titolo deve essere valorizzato',
@@ -144,10 +156,20 @@ class PostController extends Controller
             'content.min'=>'Il contenuto deve avere almeno :min caratteri',
             'content.max'=>'Il contenuto deve avere al massimo :max caratteri',
             'category_id.exists'=>'La categoria selezionata non esiste',
-            'tags[]'=>'Tag non esiste'
+            'tags[]'=>'Tag non esiste',
+            'image'=>'Il file dev\'essere un\'immagine'
         ]);
 
         $postData = $request->all();
+        if(array_key_exists('image',$postData))
+        {
+            if($post->cover)//se l'immagine vecchia è presente allora cancellala
+            {
+                Storage::delete($post->cover);  //cancello il percorso vecchio dell'immagine
+            }
+            $img_path = Storage::put('uploads',$postData['image']);
+            $postData['cover'] = $img_path;
+        }
         $post->fill($postData);
 
         $slug = Str::slug($post->title);
@@ -188,8 +210,16 @@ class PostController extends Controller
             abort(404);
           }
         */
-        $post->delete();
         $post->tags()->sync([]);
+
+
+          if($post->cover)
+          {
+              Storage::delete($post->cover);
+          }
+
+        $post->delete();
+
 
         return redirect()->route('admin.posts.index');
     }

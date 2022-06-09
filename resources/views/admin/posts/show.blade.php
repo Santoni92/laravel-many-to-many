@@ -16,8 +16,14 @@
     <div>
         <h3>Tag relativi al post</h3>
         @foreach ($post->tags as $tag)
+            <!-- dynamic properties laravel -->
             <span>{{ $tag->name }}</span>
         @endforeach
+    </div>
+
+    <div>
+        <h3>Cover</h3>
+        <img src="{{ asset('storage/' . $post->cover) }}" alt="">
     </div>
 
     <a href="{{ route('admin.posts.edit', $post->id) }}">Modifica post</a>

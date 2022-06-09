@@ -49,11 +49,17 @@
                 <label for="tags[]">{{ $tag->name }}</label>
                 <input type="checkbox" name="tags[]" value="{{ $tag->id }}"
                     {{ in_array($tag->id, old('tags', [])) ? 'checked' : '' }}>
+                <!-- le [] vanno solo nel name cosicché laravel possa convertire in automatico in un array -->
             @endforeach
 
             @error('tags[]')
                 {{ $message }}
             @enderror
+        </div>
+        <!--per fare l'upload di un file (in questo caso una immagine) -->
+        <div>
+            <label for="image">Immagine cover</label>
+            <input type="file" name="image">
         </div>
 
         <button type="submit">Salva il post creato</button>
