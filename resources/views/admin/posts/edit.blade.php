@@ -12,7 +12,7 @@
         </div>
     @endif
 
-    <form action="{{ route('admin.posts.update', $post->id) }}" method="post">
+    <form action="{{ route('admin.posts.update', $post->id) }}" method="post" enctype="multipart/form-data">
         @csrf
 
         @method('put')
@@ -72,6 +72,9 @@
             @endif
             <label for="image">Immagine cover</label>
             <input type="file" name="image">
+            @error('image')
+                {{ $message }}
+            @enderror
         </div>
 
         <button type="submit">Modifica il post</button>

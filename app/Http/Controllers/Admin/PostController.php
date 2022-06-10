@@ -67,7 +67,7 @@ class PostController extends Controller
         $postData = $request->all();
         if(array_key_exists('image',$postData))
         {
-            $img_path = Storage::put('uploads',$postData['image']);
+            $img_path = Storage::put('uploads',$postData['image']); //ci restituisce il percorso del file sul server
             $postData['cover'] = $img_path;
         }
         $newPost = new Post();

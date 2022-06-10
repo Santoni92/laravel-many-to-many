@@ -14,7 +14,7 @@
 
     <h1>Crea un nuovo post</h1>
 
-    <form action="{{ route('admin.posts.store') }}" method="post">
+    <form action="{{ route('admin.posts.store') }}" method="post" enctype="multipart/form-data">
         @csrf
         <div>
             <label for="title">Titolo:</label>
@@ -60,6 +60,9 @@
         <div>
             <label for="image">Immagine cover</label>
             <input type="file" name="image">
+            @error('image')
+                {{ $message }}
+            @enderror
         </div>
 
         <button type="submit">Salva il post creato</button>
